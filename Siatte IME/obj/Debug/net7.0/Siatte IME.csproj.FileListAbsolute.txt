@@ -1,0 +1,15 @@
+C:\Users\josue\Projects\Siatte IME\bin\Debug\net7.0\Siatte IME.exe
+C:\Users\josue\Projects\Siatte IME\bin\Debug\net7.0\Siatte IME.deps.json
+C:\Users\josue\Projects\Siatte IME\bin\Debug\net7.0\Siatte IME.runtimeconfig.json
+C:\Users\josue\Projects\Siatte IME\bin\Debug\net7.0\Siatte IME.dll
+C:\Users\josue\Projects\Siatte IME\bin\Debug\net7.0\Siatte IME.pdb
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.csproj.AssemblyReference.cache
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.AssemblyInfoInputs.cache
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.AssemblyInfo.cs
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.csproj.CoreCompileInputs.cache
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.dll
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\refint\Siatte IME.dll
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.pdb
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\Siatte IME.genruntimeconfig.cache
+C:\Users\josue\Projects\Siatte IME\obj\Debug\net7.0\ref\Siatte IME.dll

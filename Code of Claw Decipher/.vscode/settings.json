@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "tree_of_transmission.h": "c",
+        "stdbool.h": "c"
+    }
+}
