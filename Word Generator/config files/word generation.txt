@@ -1,0 +1,8 @@
+character-group: c, p m b f v ť ħ ć ď t s z r n d ŕ l ś ź j k g h pŕ pr pl mr bŕ br bl fŕ fr fl fj vŕ vr vj ťr ďŕ tŕ tr sp spŕ spr spl st stŕ str sk skŕ skr sv sm sn sŕ sr sl dŕ dr dj śp śt śtŕ śtr śm śn śr śl kj kŕ kr kl g gr gl
+character-group: v, i ì e a à u o
+character-group: n, p m b f v ť ħ ć ď t s z r ł n d l ś ź j k ń g h pt ps mp mt md mf ms bt bs fp ft fs vb vd vs ts sp st sd sk rp rb rt rd rk rg rć rħ rf rv rť rs rś rm rn łm łk np nb nt nd nk nć nť nď ns nś nh ds lp lb lt ld lk lg lć lf lv ls lś lh śp śt kt gd ht
+
+pattern: (c)v(n)
+
+min-syllables: 1
+max-syllables: 3

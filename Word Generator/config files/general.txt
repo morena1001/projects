@@ -1,0 +1,4 @@
+word-count: 50
+output-as-list: yes
+allow-duplicates: yes
+file-as-output: no

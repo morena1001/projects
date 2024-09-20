@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "time.h": "c",
+        "stdio.h": "c",
+        "ctype.h": "c",
+        "stdbool.h": "c",
+        "main.h": "c",
+        "string.h": "c",
+        "settings_loader.h": "c"
+    }
+}
