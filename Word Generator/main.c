@@ -8,20 +8,19 @@
 #include "settings_loader.h"
 
 int main (int argc, char** argv) {
+    clock_t time;
+    time = clock();
+
     bool loaded_correctly = Load_General_Settings(DEFAULT_GENERAL_SETTINGS_LOCATION);
     loaded_correctly = Load_WG_Settings(DEFAULT_WG_SETTINGS_LOCATION);
 
-    Export_General_Settings ();
-    Export_WG_Settings ();
 
-    printf("DONE\n");
-
-    
-    
+    while (clock() - time < 3000);
+    Generate_Words(time);
     // system("cls");
     // Title_Screen();
 
-    // Loading_Screen();
+    // Loading_Screen(time);
 
     // system("cls");
     // Menu();
@@ -76,10 +75,7 @@ void Menu () {
     printf("Have a good day\n\n");
 }
 
-void Loading_Screen () {
-    clock_t time;
-    time = clock();
-
+void Loading_Screen (clock_t time) {
     bool loaded_correctly = Load_General_Settings(DEFAULT_GENERAL_SETTINGS_LOCATION);
     if (!loaded_correctly)  exit(1);
 
@@ -174,7 +170,48 @@ void Export_WG_Settings () {
     free(value);
 }
 
-void Generate_Words () {
-    // char* parsed_pattern;
-    // for (int i = 0; )
+void Generate_Words (clock_t time) {
+    // variable to store the generated words
+    char** words = malloc(sizeof(char*) * general_settings.word_count);
+    
+    // 1st loop, loops so that a word_count amount of words are generated
+    for (int i = 0; i < general_settings.word_count; i++) {
+        // allocate space of 100 characters per element in words
+        words[i] = malloc(sizeof(char) * MAX_GENERATED_WORD_SIZE);
+
+        // seed the random number variable according to how much time has passed in the program
+        srand((i * 1000 - (clock() - time)) % 17);
+        // 2nd loop, loops are randomized number of times in the range of the minimum and maximum syllables allowed for a word
+        for (int j = 0; j < (rand() % (wg_settings.max_syllables - wg_settings.min_syllables)) + wg_settings.min_syllables; j++) {
+            // 3rd loop, iterate through the pattern
+            for (int k = 0; k < wg_settings.pattern_data.group_in_pattern_count; k++) {
+                // if a group in the pattern optional, generate a random to see if to skip it or not
+                if (wg_settings.pattern_data.parsed_pattern[k][0] == '~') {
+                    srand((i + j + k * 1000 - (clock() - time)) % 17);
+                    if (rand() % 2) {
+                        // 4th loop, iterate through the groups to find the correct character group 
+                        for (int l = 0; l < wg_settings.character_group_data.character_group_count; l++) {
+                            if (wg_settings.pattern_data.parsed_pattern[k][1] == wg_settings.character_group_data.character_groups[l][0][0]) {
+                                srand((i + j + k + l * 1000 - (clock() - time)) % 17);
+                                words[i] = wg_settings.character_group_data.character_groups[l][(rand() % (wg_settings.character_group_data.character_group_sizes[l] - 1)) + 1];
+                            }
+                        }
+                    } else {
+                        continue;
+                    }
+                } else {
+                    for (int l = 0; l < wg_settings.character_group_data.character_group_count; l++) {
+                        if (wg_settings.pattern_data.parsed_pattern[k][0] == wg_settings.character_group_data.character_groups[l][0][0]) {
+                            srand((i + j + k + l * 1000 - (clock() - time)) % 17);
+                            words[i] = wg_settings.character_group_data.character_groups[l][(rand() % (wg_settings.character_group_data.character_group_sizes[l] - 1)) + 1];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < general_settings.word_count; i++) {
+        printf("%s%s", words[i], general_settings.output_as_list ? "\n" : " ");
+    }
 }

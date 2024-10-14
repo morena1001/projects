@@ -30,13 +30,7 @@ struct general_settings_s {
 
 struct wg_settings_s {
     struct character_group_data_s character_group_data;
-    // char*** character_groups;
-    // int character_group_count;
-    // int* character_group_sizes;
     struct pattern_data_s pattern_data;
-    // char* pattern;
-    // char** parsed_pattern;
-    // int group_in_pattern_count;
     int min_syllables;
     int max_syllables;
 };

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "alarm_system.h": "c",
+        "stdarg.h": "c"
+    }
+}
