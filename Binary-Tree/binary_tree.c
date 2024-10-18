@@ -9,6 +9,10 @@ node_t* root;
 queue_t* head;
 queue_t* tail;
 
+//
+// BST FUNCTIONS
+//
+
 node_t* Make_Node (int value) {
     node_t* node = (node_t*) calloc (1, sizeof (node_t));
     node->value = value;
@@ -33,7 +37,7 @@ void Assign_Root (node_t* node) {
     root = node;
 }
 
-void Insert_Node (int value) {
+void BST_Insert_Node (int value) {
     node_t* node = Make_Node (value);
     
     if (root == NULL) {
@@ -61,7 +65,7 @@ void Insert_Node (int value) {
     }
 }
 
-void Remove_Node (node_t* node) {
+void BST_Remove_Node (node_t* node) {
     node_t* parent = Find_Parent (node->value);
 
     if (node == root) {
@@ -127,17 +131,167 @@ node_t* Find_Parent(int value) {
     node_t* parent = root;
     node_t* child = value < parent->value ? parent->left : parent->right;
 
-    if (child == NULL)      return NULL;
+    if (child == NULL)              return NULL;
     
     while (child->value != value) {
         parent = child;
         child = value < parent->value ? parent->left : parent->right;
 
-        if (child == NULL)      return NULL;
+        if (child == NULL)          return NULL;
     }
+
+    free (child);
         
     return parent;
 }
+
+node_t* Find_Parent_Node (node_t* child) {
+    if (root == child)          return NULL;
+
+    node_t* parent = root;
+    node_t* temp_child = child->value < parent->value ? parent->left : parent->right;
+
+    if (temp_child == NULL)          return NULL;
+
+    while (temp_child != child) {
+        parent = temp_child;
+        temp_child = child->value < parent->value ? parent->left : parent->right;
+
+        if (temp_child == NULL)      return NULL;
+    }
+
+    return parent;
+}
+
+//
+// AVL FUNCTIONS
+//
+
+void AVL_Insert_Node (int value) {
+    node_t* node = Make_Node (value);
+    
+    if (root == NULL) {
+        Assign_Root (node);
+    } else {
+        node_t* temp = root;
+        bool left = false;
+
+        while (1) {
+            if (temp == NULL) {
+                break;
+            } 
+            
+            left = node->value < temp->value;
+            if (left && temp->left == NULL) {
+                temp->left = node;
+                break;
+            } else if (!left && temp->right == NULL) {
+                temp->right = node;
+                break;
+            } else {
+                temp = left ? temp->left : temp->right;
+            }
+        }
+
+        node_t* parent = Find_Parent_Node (node);
+
+        while (parent != NULL) {
+            if (Depth (parent->right) - Depth (parent->left) > 1) {
+                if  (parent->right->right != NULL)          Left_Rotation (parent);
+                else if (parent->right->left != NULL)       Right_Left_Rotation (parent);
+                parent = Find_Parent_Node (parent);
+                
+            } else if (Depth (parent->left) - Depth (parent->right) > 1) {
+                if (parent->left->left != NULL)             Right_Rotation (parent);
+                else if (parent->left->right != NULL)       Left_Right_Rotation (parent);
+                parent = Find_Parent_Node (parent);
+            } 
+            
+            if (parent == root)     break;
+
+            parent = Find_Parent_Node (parent);
+        }
+    }
+}
+
+void AVL_Remove_Node (node_t* node) {
+
+}
+
+int Depth (node_t* node) {
+    if (node == NULL) {
+        return 0;
+    } else if (node->left == NULL && node->right == NULL) {
+        return 1;
+    } else {
+        int left_subtree = Depth (node->left) + 1;
+        int right_subtree = Depth (node->right) + 1;
+
+        return left_subtree > right_subtree ? left_subtree : right_subtree;
+    }
+}
+
+void Left_Rotation (node_t* top_node) {
+    if (top_node == NULL) {
+        return;
+    }
+
+    if (top_node == root) {
+        root = top_node->right;
+        root->left = top_node;
+        root->left->right = NULL;
+    } else {
+        node_t* parent = Find_Parent_Node (top_node);
+
+        if (parent->left == top_node) {
+            parent->left = top_node->right;
+            parent->left->left = top_node;
+            parent->left->left->right = NULL;
+        } else {
+            parent->right = top_node->right;
+            parent->right->left = top_node;
+            parent->right->left->right = NULL;
+        }
+    }
+}
+
+void Right_Rotation (node_t* top_node) {
+    if (top_node == NULL) {
+        return;
+    }
+
+    if (top_node == root) {
+        root = top_node->left;
+        root->right = top_node;
+        root->right->left = NULL;
+    } else {
+        node_t* parent = Find_Parent_Node (top_node);
+
+        if (parent->left == top_node) {
+            parent->left = top_node->left;
+            parent->left->right = top_node;
+            parent->left->right->left = NULL;
+        } else {
+            parent->right = top_node->left;
+            parent->right->right = top_node;
+            parent->right->right->left = NULL;
+        }
+    }
+}
+
+void Left_Right_Rotation (node_t* top_node) {
+    Left_Rotation (top_node->left);
+    Right_Rotation (top_node);
+}
+
+void Right_Left_Rotation (node_t* top_node) {
+    Right_Rotation (top_node->right);
+    Left_Rotation (top_node);
+}
+
+//
+// PRINTING FUNCTIONS
+//
 
 void Print_Inorder (node_t* node) {
     Queue_Init ();
@@ -179,6 +333,10 @@ if (node == NULL) {
         printf ("%d ", node->value);
     }
 }
+
+//
+// QUEUE FUNCTIONS
+//
 
 void Queue_Init () {
     head = (queue_t*) calloc (1, sizeof (queue_t));

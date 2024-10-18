@@ -16,16 +16,30 @@ struct Queue {
     queue_t* next; 
 };
 
+// BST FUNCTIONS
 node_t* Make_Node (int value);
 void Free_Node (node_t* node);
 
 void Assign_Root (node_t* node);
 
-void Insert_Node (int value);
-void Remove_Node (node_t* node);
+void BST_Insert_Node (int value);
+void BST_Remove_Node (node_t* node);
 
-node_t* Find_Parent(int value);
+node_t* Find_Parent (int value);
+node_t* Find_Parent_Node (node_t* child);
 
+// AVL FUNCTIONS
+void AVL_Insert_Node (int value);
+void AVL_Remove_Node (node_t* node);
+
+int Depth (node_t* node);
+
+void Left_Rotation (node_t* top_node);
+void Right_Rotation (node_t* top_node);
+void Left_Right_Rotation (node_t* top_node);
+void Right_Left_Rotation (node_t* top_node);
+
+// PRINTING FUNCTIONS
 void Print_Inorder (node_t* node);
 void Print_Preorder (node_t* node);
 void Print_Postorder (node_t* node);
