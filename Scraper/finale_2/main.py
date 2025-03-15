@@ -47,22 +47,30 @@ driver.get ("https://x.com/syakenosu/media")
 time.sleep (2)
 
 inner = driver.find_element (By.XPATH, '//*[contains(text(),"photos & videos")]')
-numPages = math.ceil (int (inner.get_attribute ("innerHTML").split (" ")[0]) / 30)
+numPages = math.ceil (int (inner.get_attribute ("innerHTML").split (" ")[0]) / 30) + 1
 stopScrolling = 0
+links = []
+
 while True:
+    list = driver.find_elements (By.XPATH, '//img')
+    for item in list:
+        src = item.get_attribute ("src")
+        if src.startswith ("https://pbs.twimg.com/media/") and src not in links:
+            links.append (src)
+
     stopScrolling += 1;
     driver.execute_script("window.scrollTo(0,document.body.scrollHeight)", "")
     if stopScrolling > numPages:
         break;
     time.sleep (2)
 
-list = driver.find_elements (By.XPATH, '//img')
-links = []
-for item in list:
-    # ALSO GRAB EXTRA IMAGES HIDDEN INSIDE TWEETS
-    if item.get_attribute ("src").startswith ("https://pbs.twimg.com/media/"):
-        # print ((item.get_attribute ("class")) + "   " + str (item.get_attribute ("src").startswith ("https://pbs.twimg.com/media/")))
-        links.append (item.get_attribute ("src"))
+# list = driver.find_elements (By.XPATH, '//img')
+# links = []
+# for item in list:
+#     # ALSO GRAB EXTRA IMAGES HIDDEN INSIDE TWEETS
+#     if item.get_attribute ("src").startswith ("https://pbs.twimg.com/media/"):
+#         # print ((item.get_attribute ("class")) + "   " + str (item.get_attribute ("src").startswith ("https://pbs.twimg.com/media/")))
+#         links.append (item.get_attribute ("src"))
 df = pd.DataFrame ({"links": links})
 df.to_csv ("links.csv", index=False, encoding="utf-8")
 print ("FINISHED")
