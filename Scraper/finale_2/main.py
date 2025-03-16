@@ -49,22 +49,39 @@ def navigateLogIn (driver, info):
 # SCRAPING LINKS FOR ALL NON NESTED IMAGE
 def scrapeLinks (driver):
     inner = driver.find_element (By.XPATH, '//*[contains(text(),"photos & videos")]')
-    numPages = math.ceil (int (inner.get_attribute ("innerHTML").split (" ")[0]) / 30) + 1
+    numPages = math.ceil (int (inner.get_attribute ("innerHTML").split (" ")[0]) / 30)
     stopScrolling = 0
     links = []
+    nested_links = []
 
     while True:
         list = driver.find_elements (By.XPATH, '//img')
         for item in list:
-            src = item.get_attribute ("src")
-            if src.startswith ("https://pbs.twimg.com/media/") and src not in links:
-                links.append (src)
+            parent = item.find_element (By.XPATH, "./../../../..")
+            svg = parent.find_elements (By.TAG_NAME, "svg")
+
+            if len (svg) != 0:
+                nested_links.append (parent.get_attribute ("href"))
+            else:    
+                src = item.get_attribute ("src")
+                if src.startswith ("https://pbs.twimg.com/media/") and src not in links:
+                    links.append (src)
 
         stopScrolling += 1
         driver.execute_script("window.scrollTo(0,document.body.scrollHeight)", "")
         if stopScrolling > numPages:
             break
         time.sleep (1.5)
+
+    for link in nested_links:
+        driver.get (link)
+        time.sleep (1.5)
+        list = driver.find_elements (By.XPATH, '//img')
+        for item in list:
+            src = item.get_attribute ("src")
+            if src.startswith ("https://pbs.twimg.com/media") and src not in links:
+                links.append (src)
+
     driver.quit ()
     return links
 
@@ -104,6 +121,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Initialize information object
+    if isinstance (args.user, list):        args.user = args.user[0]
+    if isinstance (args.email, list):       args.email = args.email[0]
+    if isinstance (args.password, list):    args.password = args.password[0]
+    if isinstance (args.username, list):    args.username = args.username[0]
     info = information (args.user, args.email, args.password, args.username)
 
     # Initialize webdriver and navigate to account page
