@@ -55,12 +55,12 @@ def listLogIn (driver, info):
     try:
         element = driver.find_element (By.XPATH, '//input[@id="i0118"]')
     except:
-        driver.find_element (By.XPATH, '//input[@id="passwordEntry"]').send_keys (info.lEmail)
+        driver.find_element (By.XPATH, '//input[@id="passwordEntry"]').send_keys (info.lPassword)
         driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
     else:
         element.send_keys (info.lPassword)
         driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
-    time.sleep (1)
+    time.sleep (1.5)
 
     try:
         element = driver.find_element (By.XPATH, '//button[@id="declineButton"]')
@@ -69,31 +69,6 @@ def listLogIn (driver, info):
     else:
         element.click ()
     time.sleep (2)
-
-    # element = driver.find_element (By.XPATH, '//input[@id="i0116"]')
-    # if element.is_displayed ():
-    #     element.send_keys (info.lEmail)
-    #     driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
-    # else:
-    #     driver.find_element (By.XPATH, '//input[@id="usernameEntry"]').send_keys (info.lEmail)
-    #     driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
-    # time.sleep (1)
-
-    # element = driver.find_element (By.XPATH, '//input[@id="i0118"]')
-    # if element.is_displayed ():
-    #     element.send_keys (info.lPassword)
-    #     driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
-    # else:
-    #     driver.find_element (By.XPATH, '//input[@id="passwordEntry"]').send_keys (info.lEmail)
-    #     driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
-    # time.sleep (1)
-
-    # element = driver.find_element (By.XPATH, '//button[@id="declineButton"]')
-    # if element.is_displayed ():
-    #     element.click ()
-    # else:
-    #     driver.find_element (By.XPATH, '//button[@data-testid="secondaryButton"]').click ()
-    # time.sleep (2)
 
 
 # SCRAPE ACCOUNT INFORMATION 
@@ -115,17 +90,27 @@ def scrapeAccounts (driver, info):
 def uploadData (driver, data):
     driver.get ("https://lists.live.com/?listId=029f2ab5de3e47f99b768906150d9e3d%5F7427cb0e3787e72f")
     time.sleep (3)
-# <button type="button" role="menuitem" class="item_a4f5cb66 primary_a4f5cb66" data-id="new" data-automationid="newCommand" tabindex="0" data-actions="[{&quot;key&quot;:&quot;cmdbar-itm-click&quot;,&quot;data&quot;:&quot;new&quot;}]"><span class="container_a4f5cb66"><i role="presentation" class="icon_ea705809 css-45 " name="CalculatorAddition" data-icon-name="CalculatorAddition" aria-hidden="true"></i><span class="text_a4f5cb66 textWithoutSubMenu_a4f5cb66">Add new item</span></span></button>
-    # for item in data:
-    # driver.find_element (By.XPATH, '//*[data-id="new"]').click ()
-    driver.switch_to.active_element.send_keys (Keys.TAB)
-    driver.switch_to.active_element.send_keys (Keys.ENTER)
-    time.sleep (2)
-    driver.find_element (By.XPATH, '//input[@id="TextField13]').send_keys (info.data[0][0])
-    driver.find_element (By.XPATH, '//input[@id="TextField18]').send_keys (info.data[0][1])
-    driver.find_element (By.XPATH, '//div[@id="displayView-displayDiv-MaxNumberofMedia"]').send_keys (info.data[0][2])
-    driver.find_element (By.XPATH, '//div[@id="Flyout-0"]').click ()
-    # driver.find_element (By.XPATH, '//button[@data-automationid="ReactClientFormSaveButton"]').click ()
+
+    frame = driver.find_element (By.XPATH, '//iframe')
+    driver.switch_to.frame (frame)
+    time.sleep (1.5)
+
+    for i in range (len (data)):        
+        driver.find_element (By.XPATH, '//button[@data-id="new"]').click ()
+        time.sleep (1.5)
+
+        fields = driver.find_elements (By.XPATH, '//../div[@class="ReactFieldEditor"]')
+        while len (fields) == 0:
+            time.sleep (1)
+            fields = driver.find_elements (By.XPATH, '//../div[@class="ReactFieldEditor"]')
+        
+        fields[2].find_element (By.XPATH, './span/div/div[1]/div/div/input').send_keys (data[i][0])
+        fields[2].find_element (By.XPATH, './span/div/div[2]/div/div/input').send_keys (data[i][1])
+        fields[3].find_element (By.XPATH, './span/div').click ()
+        driver.switch_to.active_element.send_keys (data[i][2])
+        driver.find_element (By.XPATH, '//div[@id="Flyout-0"]').click ()    
+        driver.find_element (By.XPATH, '//button[@data-automationid="ReactClientFormSaveButton"]').click ()
+        time.sleep (1)
 
 # Transform the actual number of media into the nearest max number
 def toNearestMax (value):
@@ -206,24 +191,23 @@ if __name__ == "__main__":
     print ("FINISHED INITIALIZATION OF WEBDRIVER")
 
     # Log in to x and lists
-    # print ("BEGINNING LOG IN PROCESS OF X")
-    # xLogIn (driver, info)
-    # print ("FINISHED LOG IN PROCESS OF X")
+    print ("BEGINNING LOG IN PROCESS OF X")
+    xLogIn (driver, info)
+    print ("FINISHED LOG IN PROCESS OF X")
 
     print ("BEGINNING LOG IN PROCESS OF LISTS")
     listLogIn (driver, info)
     print ("FINISHED LOG IN PROCESS OF LISTS")
 
-    # # Extract all the necessary information for the list
-    # print ("BEGINNING DATA SCRAPING PROCESS")
-    # data = scrapeAccounts (driver, info)
-    # print ("FINISHED DATA SCRAPING PROCESS")
+    # Extract all the necessary information for the list
+    print ("BEGINNING DATA SCRAPING PROCESS")
+    data = scrapeAccounts (driver, info)
+    print ("FINISHED DATA SCRAPING PROCESS")
 
-    data = [['https://x.com/yuzu_mog/media', 'yuzu_mog', 2029], ['https://x.com/fallinfIowr/media', 'fallinfIowr', 91], ['https://x.com/OAZ0424SR/media', 'OAZ0424SR', 87]]
-
-    # # Upload all the information to the list
+    # Upload all the information to the list
     print ("BEGINNING DATA UPLOAD PROCESS")
     uploadData (driver, data)
     print ("FINISHED DATA UPLOADING PROCESS")
 
-    # print ("FINISHED ENTIRE PROCESS :)")
+    driver.quit ()
+    print ("FINISHED ENTIRE PROCESS :)")
