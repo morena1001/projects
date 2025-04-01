@@ -1,8 +1,11 @@
 import time
 import argparse
+import pandas as pd
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver import ChromeOptions
@@ -23,51 +26,60 @@ def baseOptions (no_window: bool):
 # LOGGING IN TO X
 def xLogIn (driver, info):
     driver.get ("https://x.com/i/flow/login")
-    time.sleep (3)
-    #LOGIN
-    driver.find_element (By.XPATH,'//input').send_keys (info.xUsername)
-    driver.find_elements (By.XPATH, '//*[@role="button"]')[2].click ()
-    time.sleep (1.5)
+
+    WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//input'))).send_keys (info.xUsername)
+    driver.find_element (By.XPATH, '//button[@class="css-175oi2r r-sdzlij r-1phboty r-rs99b7 r-lrvibr r-ywje51 r-184id4b r-13qz1uu r-2yi16 r-1qi8awa r-3pj75a r-1loqt21 r-o7ynqc r-6416eg r-1ny4l3l"]').click ()
+    
     # if len (driver.find_elements (By.XPATH,'//*[name="password"]')) == 0:
     #     driver.find_element (By.XPATH,'//input').send_keys (email)
     #     time.sleep (1)
     #     driver.find_elements (By.XPATH, '//*[@role="button"]')[1].click ()
     #     time.sleep (2)
-    driver.find_elements (By.XPATH,'//input')[1].send_keys (info.xPassword)
+
+    WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//input[@type="password"]'))).send_keys (info.xPassword)
     driver.find_elements (By.XPATH, '//*[@role="button"]')[3].click ()
     time.sleep (1.5)
 
 # LOGGING IN TO MICROSOFT LISTS
 def listLogIn (driver, info):
     driver.get ("https://lists.live.com/?listId=029f2ab5de3e47f99b768906150d9e3d%5F7427cb0e3787e72f")
-    time.sleep (3)
 
     try:
-        element = driver.find_element (By.XPATH, '//input[@id="i0116"]')
+        element = WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//input[@id="i0116"]')))
     except:
         driver.find_element (By.XPATH, '//input[@id="usernameEntry"]').send_keys (info.lEmail)
         driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
+
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//input[@id="passwordEntry"]'))).send_keys (info.lPassword)
+        # driver.find_element (By.XPATH, '//input[@id="passwordEntry"]').send_keys (info.lPassword)
+        driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
+
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//button[@data-testid="secondaryButton"]'))).click ()
+        # driver.find_element (By.XPATH, '//button[@data-testid="secondaryButton"]').click ()
     else:
         element.send_keys (info.lEmail)
         driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
-    time.sleep (1)
-
-    try:
-        element = driver.find_element (By.XPATH, '//input[@id="i0118"]')
-    except:
-        driver.find_element (By.XPATH, '//input[@id="passwordEntry"]').send_keys (info.lPassword)
-        driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
-    else:
-        element.send_keys (info.lPassword)
+        
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//input[@id="i0118"]'))).send_keys (info.lPassword)
         driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
-    time.sleep (1.5)
 
-    try:
-        element = driver.find_element (By.XPATH, '//button[@id="declineButton"]')
-    except:
-        driver.find_element (By.XPATH, '//button[@data-testid="secondaryButton"]').click ()
-    else:
-        element.click ()
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//button[@id="declineButton"]'))).click ()
+
+    # try:
+    #     element = WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//input[@id="i0118"]')))
+    # except:
+    #     driver.find_element (By.XPATH, '//input[@id="passwordEntry"]').send_keys (info.lPassword)
+    #     driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
+    # else:
+    #     element.send_keys (info.lPassword)
+    #     driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
+
+    # try:
+    #     element = WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//button[@id="declineButton"]')))
+    # except:
+    #     driver.find_element (By.XPATH, '//button[@data-testid="secondaryButton"]').click ()
+    # else:
+    #     element.click ()
     time.sleep (2)
 
 
@@ -77,7 +89,7 @@ def scrapeAccounts (driver, info):
 
     for account in info.accounts:
         driver.get (account)
-        time.sleep (1)
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//*[contains(text(),"photos & videos")]')))
         item = []
         item.append (account)
         item.append (account[14:-6])
@@ -96,13 +108,10 @@ def uploadData (driver, data):
     time.sleep (1.5)
 
     for i in range (len (data)):        
-        driver.find_element (By.XPATH, '//button[@data-id="new"]').click ()
-        time.sleep (1.5)
+        driver.find_element (By.XPATH, '//button[@data-id="new"]').click ()    
 
+        WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//../div[@class="ReactFieldEditor"]')))
         fields = driver.find_elements (By.XPATH, '//../div[@class="ReactFieldEditor"]')
-        while len (fields) == 0:
-            time.sleep (1)
-            fields = driver.find_elements (By.XPATH, '//../div[@class="ReactFieldEditor"]')
         
         fields[2].find_element (By.XPATH, './span/div/div[1]/div/div/input').send_keys (data[i][0])
         fields[2].find_element (By.XPATH, './span/div/div[2]/div/div/input').send_keys (data[i][1])
@@ -146,16 +155,53 @@ def toNearestMax (value):
         return "3000"
     else:
         return "3000+"
+    
+# Parse the accounts in accounts.txt file
+def parseAccounts ():
+    accounts = []
+
+    file = open ('accounts.txt', 'r')
+    for account in file:
+        accounts.append (account.strip ())
+
+    file.close ()
+
+    return accounts
+
+# Download the csv file from lists
+def downloadCSV (driver):
+    frame = driver.find_element (By.XPATH, '//iframe')
+    driver.switch_to.frame (frame)
+
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//button[@data-id="export"]'))).click()
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//button[@data-automationid="exportListToCSVCommand"]'))).click()
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//button[@data-automationid="splitbuttonprimary"]')))
+
+# Check that any of the accounts to be added is not already in the list
+def checkDupe (info):
+    df = pd.read_csv (info.csvFile)
+    links = df.pop('Account Link').dropna ()
+
+    for i in range (len (links)):
+        if not links[i].endswith ("/media"):
+            links = links.drop (i)
+            i -= 1
+
+    links = links.tolist ()
+    for account in info.accounts:
+        if account in links:
+            info.accounts.remove (account)
 
 
 
 class information:
-    def __init__ (self, xEmail: str, xUsername: str, xPassword: str, lEmail: str, lPassword: str, accounts: list):
+    def __init__ (self, xEmail: str, xUsername: str, xPassword: str, lEmail: str, lPassword: str, downloc:str, accounts: list):
         self.xEmail = xEmail
         self.xPassword = xPassword
         self.xUsername = xUsername
         self.lEmail = lEmail
         self.lPassword = lPassword
+        self.csvFile = downloc + 'Accounts.csv'
         self.accounts = []
 
         for account in accounts:
@@ -167,11 +213,13 @@ class information:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser ("Creating a list of accounts to scrape their images")
     parser.add_argument ('-nw', '--no_window', action="store_true")
+    parser.add_argument ('-uf', '--use_file', action="store_true")
     parser.add_argument ('-xe', '--xEmail',  metavar="xEmail", type=str, nargs=1, help="x email to log in", default="deadone1001@gmail.com")
     parser.add_argument ('-un', '--username',  metavar="username", type=str, nargs=1, help="x username to log in", default="deadone1001")
     parser.add_argument ('-xp', '--xPassword',  metavar="xPassword", type=str, nargs=1, help="x password to log in", default="1234567890qwerpoiuty..")
     parser.add_argument ('-le', '--lEmail', metavar='lEmail', type=str, nargs=1, help='lists email to log in', default='')
     parser.add_argument ('-lp', '--lPassword', metavar='lPassword', type=str, nargs=1, help='lists password to log in', default='')
+    parser.add_argument ('-dl', '--download_location', metavar='downloc', type=str, nargs=1, help='The normal file download location to use the csv file from lists', default="C:\\Users\\josue\\Downloads\\")
     parser.add_argument ('-u', '--users',  metavar="users", type=str, nargs='+', help="Users to parse info from")
 
     args = parser.parse_args ()
@@ -182,7 +230,7 @@ if __name__ == "__main__":
     if isinstance (args.xPassword, list):      args.xPassword = args.xPassword[0]
     if isinstance (args.lEmail, list):          args.lEmail = args.lEmail[0]
     if isinstance (args.lPassword, list):      args.lPassword = args.lPassword[0]
-    info = information (args.xEmail, args.username, args.xPassword, args.lEmail, args.lPassword, args.users)
+    info = information (args.xEmail, args.username, args.xPassword, args.lEmail, args.lPassword, args.download_location, parseAccounts () if args.use_file else args.users)
 
     # Initialize webdriver
     print ("BEGINNING INITIALIZATION OF WEBDRIVER")
@@ -198,6 +246,16 @@ if __name__ == "__main__":
     print ("BEGINNING LOG IN PROCESS OF LISTS")
     listLogIn (driver, info)
     print ("FINISHED LOG IN PROCESS OF LISTS")
+
+    # Download the csv file to make sure an account is not added twice
+    print ("BEGINNING CSV DOWNLOAD PROCESS")
+    downloadCSV (driver)
+    print ("FINISHED CSV DOWNLOAD PROCESS")
+
+    # Make sure each account is not already in the list
+    print ("BEGINNING DUPLICATE CHECKING PROCESS")
+    checkDupe (info)
+    print ("FINISHED DUPLICATE CHECKING PROCESS")
 
     # Extract all the necessary information for the list
     print ("BEGINNING DATA SCRAPING PROCESS")
