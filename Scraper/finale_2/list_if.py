@@ -1,6 +1,7 @@
 import time
 import argparse
 import pandas as pd
+import os
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -38,7 +39,7 @@ def xLogIn (driver, info):
 
     WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//input[@type="password"]'))).send_keys (info.xPassword)
     driver.find_elements (By.XPATH, '//*[@role="button"]')[3].click ()
-    time.sleep (1.5)
+    time.sleep (3)
 
 # LOGGING IN TO MICROSOFT LISTS
 def listLogIn (driver, info):
@@ -64,37 +65,24 @@ def listLogIn (driver, info):
         driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
 
         WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//button[@id="declineButton"]'))).click ()
-
-    # try:
-    #     element = WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//input[@id="i0118"]')))
-    # except:
-    #     driver.find_element (By.XPATH, '//input[@id="passwordEntry"]').send_keys (info.lPassword)
-    #     driver.find_element (By.XPATH, '//button[@type="submit"]').click ()
-    # else:
-    #     element.send_keys (info.lPassword)
-    #     driver.find_element (By.XPATH, '//button[@id="idSIButton9"]').click ()
-
-    # try:
-    #     element = WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//button[@id="declineButton"]')))
-    # except:
-    #     driver.find_element (By.XPATH, '//button[@data-testid="secondaryButton"]').click ()
-    # else:
-    #     element.click ()
     time.sleep (2)
 
 
 # SCRAPE ACCOUNT INFORMATION 
 def scrapeAccounts (driver, info):
     list = []
+    idx = 1
 
     for account in info.accounts:
+        print ("account " + str (idx) + " of " + str (len (info.accounts)))     
         driver.get (account)
-        WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, '//*[contains(text(),"photos & videos")]')))
+        WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//*[contains(text(),"photos & videos")]')))
         item = []
         item.append (account)
         item.append (account[14:-6])
         item.append (toNearestMax (int (driver.find_element (By.XPATH, '//*[contains(text(),"photos & videos")]').get_attribute ("innerHTML").split (" ")[0].replace (",", ""))))
         list.append (item)
+        idx += 1
 
     return list
 
@@ -107,7 +95,8 @@ def uploadData (driver, data):
     driver.switch_to.frame (frame)
     time.sleep (1.5)
 
-    for i in range (len (data)):        
+    for i in range (len (data)):
+        print ("account " + str (i) + " of " + str (len (data)))        
         driver.find_element (By.XPATH, '//button[@data-id="new"]').click ()    
 
         WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.XPATH, '//../div[@class="ReactFieldEditor"]')))
@@ -180,10 +169,17 @@ def downloadCSV (driver):
 # Check that any of the accounts to be added is not already in the list
 def checkDupe (info):
     df = pd.read_csv (info.csvFile)
+
+    row_counter = 0
+    for ind, row in df.iterrows():
+        cell_value = str(row['Account Link'])
+        df.loc[row_counter, 'Account Link'] = cell_value
+        row_counter += 1
+
     links = df.pop('Account Link').dropna ()
 
     for i in range (len (links)):
-        if not links[i].endswith ("/media"):
+        if links[i] is None or not links[i].endswith ("/media"):
             links = links.drop (i)
             i -= 1
 
@@ -191,6 +187,8 @@ def checkDupe (info):
     for account in info.accounts:
         if account in links:
             info.accounts.remove (account)
+
+    os.remove (info.csvFile)
 
 
 
